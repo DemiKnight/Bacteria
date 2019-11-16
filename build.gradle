@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'scala'
+//    id "me.champeau.gradle.jmh" version "0.5.0"
+
+}
+
+group 'uk.co.alexknight'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.scala-lang:scala-library:2.11.12'
+    testImplementation 'org.scalatest:scalatest_2.11:3.0.0'
+//    testCompile group: 'junit', name: 'junit', version: '5.4'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+
+}
