@@ -6,6 +6,8 @@ public class BacteriaSim
 {
     //Main bacteria that are currently alive.
     private ArrayList<int[]> bacteriaStore = new ArrayList<>();
+    private HashSet<int[]> bacStore = new HashSet<>();
+
 
     //Used during a generation to save potential locations for bacteria.
     private ArrayList<int[]> reproductionCheck = new ArrayList<>();
@@ -25,12 +27,16 @@ public class BacteriaSim
                             .mapToInt(Integer::parseInt).toArray() //Convert to int[] location.
                     );
         }
-        sort();
+//        sort();
     }
 
     public void inputBac(int[][] inputArray)
     {
         Collections.addAll(bacteriaStore, inputArray);
+    }
+    public void inputBac(int[] input)
+    {
+        bacteriaStore.add(input);
     }
 
 
@@ -71,7 +77,7 @@ public class BacteriaSim
         bacteriaStore.addAll(newBacteria); //Add reproduced Cells
 
         reproductionCheck.clear(); //Fresh for next generation
-        sort();
+//        sort();
     }
 
     private boolean willSurvive(int xLoc, int yLoc, boolean reproduction)
@@ -95,13 +101,7 @@ public class BacteriaSim
     {
         short count = 0;
 
-        int locationIndex = bacteriaStore.indexOf(new int[]{xLoc, yLoc});
-
-        //Any limits the potential existing bacteria to those within a feasible radius of potential bacteria.
-        int beginningOfSearch = (locationIndex - 4 <= 0                     ? 0                   : locationIndex - 4);
-        int endOfSearch       = (locationIndex + 4 >= bacteriaStore.size() ? bacteriaStore.size() : locationIndex + 4);
-
-        //Array of all location to check for bacteria
+        //Array of all location to check for bacteria. Not all will exist.
         int[][] test = new int[][]
                 {
                         {xLoc-1, yLoc-1}, {xLoc, yLoc-1}, {xLoc+1, yLoc-1},
@@ -109,22 +109,12 @@ public class BacteriaSim
                         {xLoc-1, yLoc+1}, {xLoc, yLoc+1}, {xLoc+1, yLoc+1},
                 };
 
-        //Check if bacteria exists, add to temp check list otherwise
-        for (int[] currentlyLivingBac : bacteriaStore.subList(beginningOfSearch, endOfSearch)) //Can be revised to only the 8 needed
+        for (int[] locationIndex: test )
         {
-            for(int[] locationsAround : test)
+            if (compareLocations(bacteriaStore, locationIndex))
             {
-                if (currentlyLivingBac[0] == locationsAround[0] && currentlyLivingBac[1] == locationsAround[1])
-                    count++; //Bacteria is present around bacteria.
-                else
-                    if
-                    (
-                        ! reproduction && //If checking for reproduction don't re-add bacteria.
-                        ! compareLocations(reproductionCheck, locationsAround) && //Check that it hasn't already been selected for reproduction
-                        ! compareLocations(bacteriaStore    , locationsAround)    //Check if bacteria isn't already present.
-                    )
-                        reproductionCheck.add(locationsAround); //Potential spot for reproduction,
-            }
+                count++;
+            }else if (! reproduction && ! compareLocations(reproductionCheck, locationIndex)) reproductionCheck.add(locationIndex);
         }
 
         return count;

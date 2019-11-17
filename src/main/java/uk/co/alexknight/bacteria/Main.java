@@ -10,13 +10,22 @@ public class Main
 
 //        sim.inputBac();
 
+        ArrayList<int[]> temp = new ArrayList<>();
+
+//        for(int indexY = 0; indexY <= 100; indexY++)
+//        {
+//            for (int indexX = 0;indexX <= 100;indexX++)
+//            {
+//                sim.inputBac(new int[]{indexX, indexY});
+//            }
+//        }
         sim.inputBac(new int[][] {
-                {3,2},
-//                {1000000002 ,1000000002},
                 {1,2},
-//                {1000000003 ,1000000002},
                 {2,2},
-//                {1000000001 ,1000000002}
+                {3,2},
+                {1000000003 ,1000000002},
+                {1000000002 ,1000000002},
+                {1000000001 ,1000000002}
         });
 //
         sim.SimGenerations(1);
