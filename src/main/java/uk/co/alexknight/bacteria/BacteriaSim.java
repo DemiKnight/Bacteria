@@ -4,13 +4,60 @@ import java.util.*;
 
 public class BacteriaSim
 {
-    //Main bacteria that are currently alive.
-    private ArrayList<int[]> bacteriaStore = new ArrayList<>();
-    private HashSet<int[]> bacStore = new HashSet<>();
+    public static class Location
+    {
+        private final int yLocation;
+        private final int xLocation;
 
+        /**
+         *
+         * @param xyLocations First needs to be x Location & Second needs to be Y Location.
+         */
+        public Location(String[] xyLocations)
+        {
+            this.xLocation = Integer.parseInt(xyLocations[0]);
+            this.yLocation = Integer.parseInt(xyLocations[1]);
+        }
+
+        public Location(int xLocation, int yLocation)
+        {
+            this.xLocation = xLocation;
+            this.yLocation = yLocation;
+        }
+
+        public int getyLocation() {
+            return yLocation;
+        }
+
+        public int getxLocation() {
+            return xLocation;
+        }
+
+        @Override
+        public boolean equals(Object newObj)
+        {
+            if (newObj instanceof Location)
+                return ((Location) newObj).xLocation == xLocation && ((Location) newObj).yLocation == yLocation;
+
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return (xLocation + "" + yLocation).hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return xLocation + "," + yLocation;
+        }
+    }
+
+    //Main bacteria that are currently alive.
+    private HashSet<Location> bacStore = new HashSet<>();
 
     //Used during a generation to save potential locations for bacteria.
-    private ArrayList<int[]> reproductionCheck = new ArrayList<>();
+    private HashSet<Location> reproductionCheck = new HashSet<>();
 
     public void input()
     {
@@ -18,25 +65,16 @@ public class BacteriaSim
 
         while (!inputScanner.hasNext("end"))
         {
-            bacteriaStore.add
+            bacStore.add
                     (
-                        Arrays.stream
-                            (
-                                inputScanner.next().split(",") //Split into String[].
-                            )
-                            .mapToInt(Integer::parseInt).toArray() //Convert to int[] location.
+                        new Location(inputScanner.next().split(","))//Split into String[] (x,y) & create location.
                     );
         }
-//        sort();
     }
 
-    public void inputBac(int[][] inputArray)
+    public void inputBac(Location[] intputArray)
     {
-        Collections.addAll(bacteriaStore, inputArray);
-    }
-    public void inputBac(int[] input)
-    {
-        bacteriaStore.add(input);
+        Collections.addAll(bacStore, intputArray);
     }
 
 
@@ -51,45 +89,45 @@ public class BacteriaSim
     public void SimGeneration()
     {
         //Bacteria that will become dead at the end of this generation.
-        ArrayList<int[]> removeLIst = new ArrayList<>();
+        ArrayList<Location> removeLIst = new ArrayList<>();
 
         //Bacteria that will reproduce to become the new generation.
-        ArrayList<int[]> newBacteria = new ArrayList<>();
+        ArrayList<Location> newBacteria = new ArrayList<>();
 
-        //Kill off
-        for (int[] selectedBac: bacteriaStore)
+        //Kill off currently living bacteria, will take effect after reproduction
+        for (Location selectedBac: bacStore)
         {
-            if (! willSurvive(selectedBac[0], selectedBac[1], false))
+            if (! willSurvive(selectedBac, false))
             {
                 removeLIst.add(selectedBac);
             }
         }
 
         //Reproduction
-        for (int[] selectedPLace : reproductionCheck)
+        //With the
+        for (Location selectedPLace : reproductionCheck)
         {
-            if (willSurvive(selectedPLace[0], selectedPLace[1], true))
+            if (willSurvive(selectedPLace, true))
                 newBacteria.add(selectedPLace);
         }
 
-        bacteriaStore.removeAll(removeLIst); //Remove dead Cells
+        bacStore.removeAll(removeLIst); //Remove dead Cells
 
-        bacteriaStore.addAll(newBacteria); //Add reproduced Cells
+        bacStore.addAll(newBacteria); //Add reproduced Cells
 
         reproductionCheck.clear(); //Fresh for next generation
-//        sort();
     }
 
-    private boolean willSurvive(int xLoc, int yLoc, boolean reproduction)
+    private boolean willSurvive(Location inputLoc, boolean reproduction)
     {
         boolean returnVal = false; //Most cases cause bacteria to die.
 
-        switch (countNeighbours(xLoc, yLoc, reproduction))
+        switch (countNeighbours(inputLoc, reproduction))
         {
             case 2:
                 returnVal = !reproduction; //If looking to create a new cell with only 2 neighbours will die/fail.
                 break;
-            case 3: // WIll live
+            case 3: // Will survive.
                 returnVal = true;
                 break;
         }
@@ -97,24 +135,37 @@ public class BacteriaSim
         return returnVal;
     }
 
-    private short countNeighbours(int xLoc, int yLoc, boolean reproduction)
+    private short countNeighbours(Location inputLoc, boolean reproduction)
     {
         short count = 0;
 
-        //Array of all location to check for bacteria. Not all will exist.
-        int[][] test = new int[][]
-                {
-                        {xLoc-1, yLoc-1}, {xLoc, yLoc-1}, {xLoc+1, yLoc-1},
-                        {xLoc-1, yLoc  }, /*{xLoc, yLoc,*/ { xLoc+1, yLoc },
-                        {xLoc-1, yLoc+1}, {xLoc, yLoc+1}, {xLoc+1, yLoc+1},
-                };
 
-        for (int[] locationIndex: test )
+        // [1,2,3]
+        // [4,5,6]
+        // [7,8,9]
+
+        //All locations surrounding the bacteria, some already occupied others created.
+        Location[] locationSurrounding = {
+            new Location(inputLoc.xLocation-1, inputLoc.yLocation-1), //1
+            new Location(inputLoc.xLocation, inputLoc.yLocation-1),             //2
+            new Location(inputLoc.xLocation+1, inputLoc.yLocation-1), //3
+
+            new Location(inputLoc.xLocation-1, inputLoc.yLocation),             //4
+                //5 Not needed, is the existing location.
+            new Location(inputLoc.xLocation+1, inputLoc.yLocation),             //6
+
+            new Location(inputLoc.xLocation-1, inputLoc.yLocation+1), //7
+            new Location(inputLoc.xLocation, inputLoc.yLocation+1),             //8
+            new Location(inputLoc.xLocation+1, inputLoc.yLocation+1), //9
+        };
+
+        //Array of all location to check for bacteria.
+        for (Location locationIndex: locationSurrounding )
         {
-            if (compareLocations(bacteriaStore, locationIndex))
+            if (bacStore.contains(locationIndex))
             {
                 count++;
-            }else if (! reproduction && ! compareLocations(reproductionCheck, locationIndex)) reproductionCheck.add(locationIndex);
+            }else if (! reproduction ) reproductionCheck.add(locationIndex); //Don't want to over-reproduce
         }
 
         return count;
@@ -122,42 +173,12 @@ public class BacteriaSim
 
     public void output()
     {
-        //Revise
-        bacteriaStore.forEach((bac) -> System.out.println(bac[0] + "," + bac[1]));
+        //Print output
+//        bacStore.forEach((loc) -> System.out.println(loc.toString()));
+        for (Location loc: bacStore)
+        {
+            System.out.println(loc.toString());
+        }
         System.out.println("end");
-    }
-
-    public ArrayList<int[]> outputBac()
-    {
-        return bacteriaStore;
-    }
-
-
-    private boolean storeContainsLocation(int[] location)
-    {
-        return compareLocations(bacteriaStore, location);
-    }
-
-    /**
-     * Lazy but saves space.
-     */
-    private boolean compareLocations(int[] loc1, int[] loc2)
-    {
-        return loc1[0] == loc2[0] && loc1[1] == loc2[1];
-    }
-
-
-    private boolean compareLocations(Collection<int[]> locations, int[] loc2)
-    {
-        //Compare's all locations for a matching set.
-        for (int[] selectedLoc : locations)
-            if (compareLocations(selectedLoc, loc2)) return true;
-        return false;
-    }
-
-    private void sort()
-    {
-        //Sort distance from origin
-        bacteriaStore.sort(Comparator.comparingInt(loc -> loc[0] + loc[1]));
     }
 }

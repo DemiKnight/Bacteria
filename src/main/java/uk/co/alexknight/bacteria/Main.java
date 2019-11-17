@@ -8,25 +8,18 @@ public class Main
     {
         BacteriaSim sim = new BacteriaSim();
 
+
+        sim.input();
 //        sim.inputBac();
 
-        ArrayList<int[]> temp = new ArrayList<>();
-
-//        for(int indexY = 0; indexY <= 100; indexY++)
-//        {
-//            for (int indexX = 0;indexX <= 100;indexX++)
-//            {
-//                sim.inputBac(new int[]{indexX, indexY});
-//            }
-//        }
-        sim.inputBac(new int[][] {
-                {1,2},
-                {2,2},
-                {3,2},
-                {1000000003 ,1000000002},
-                {1000000002 ,1000000002},
-                {1000000001 ,1000000002}
-        });
+//        sim.inputBac(new BacteriaSim.Location[] {
+//                new BacteriaSim.Location(1,2),
+//                new BacteriaSim.Location(2,2),
+//                new BacteriaSim.Location(3,2),
+//                new BacteriaSim.Location(1000000003 ,1000000002),
+//                new BacteriaSim.Location(1000000002 ,1000000002),
+//                new BacteriaSim.Location(1000000001 ,1000000002)
+//        });
 //
         sim.SimGenerations(1);
 //
