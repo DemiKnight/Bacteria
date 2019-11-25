@@ -104,7 +104,7 @@ public class BacteriaSim
         }
 
         //Reproduction
-        //With the
+        //Any potential spaces picked up with first scan for dead cells.
         for (Location selectedPLace : reproductionCheck)
         {
             if (willSurvive(selectedPLace, true))
@@ -174,7 +174,6 @@ public class BacteriaSim
     public void output()
     {
         //Print output
-//        bacStore.forEach((loc) -> System.out.println(loc.toString()));
         for (Location loc: bacStore)
         {
             System.out.println(loc.toString());
